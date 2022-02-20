@@ -19,8 +19,17 @@ aliases:
 		- A booking software is a [[domain]] that gets real people on an airplane (physical world)
 		- A core banking system is a [[domain]] that handles the abstract money and finances for a bank (imaginary world)
 		- A [[domain]] has normally nothing to do with software unless its a source-code control system like git
-	- A [[domain model]] is more then a diagram or a drawn abstraction, its all about the idea that could be conveyed by a diagram, by some lines of code, or by some words in a sentence – the medium doesn't matter
 
+- A [[domain model]] is more then a diagram or a drawn abstraction, its all about the idea that could be conveyed by a diagram, by some lines of code, or by some words in a sentence – the medium doesn't matter
+
+## Communication and the use of language
+- When people communicate, e.g. speak, they don't use the language of the [[domain model]]
+- Its a good way to refine your domain model by speech
+	- Playing around with words and sentences is the most valuable tool to sharpen and concertize the [[ubiquitous language]]. Its as important as engaging your virtual/ spatial reasoning by drawing diagrams
+	- Describe scenarios of the [[domain]] out loud within the borders of the model
+	- Try to find an easier way describe the scenario each time you combine concepts of the [[domain]] without breaking the rules of the model
+- The human brain seems to be specialized in dealing with complexity in spoken language
+	- Book Ref: [[}b_The_Language_Instinct-Steven_Pinker]]
 
 ***
 
