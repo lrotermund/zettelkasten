@@ -30,6 +30,12 @@ aliases:
 	- Try to find an easier way describe the scenario each time you combine concepts of the [[domain]] without breaking the rules of the model
 - The human brain seems to be specialized in dealing with complexity in spoken language
 	- Book Ref: [[}b_The_Language_Instinct-Steven_Pinker]]
+- By drawing a simple [[UML diagram]] with a handful of objects while discussing an issue, the participants are more focused
+	- Diagrams are a true part of a discussion. They are easy changeable while discussing the model
+	- Its easy to add some spoken words to the diagram and to discuss the change to the model or to revert it
+	- Keep diagrams small and minimal, otherwise they fail in communicating or explaining the object model – they overwhelm the readers with detail and they lack a meaning 
+	- Diagrams can show design constrains but not specifications in every detail
+- Instead of annotating diagrams with a lot of text, you should add selective and simplified diagrams to your documents – the model is not the diagram
 
 ***
 
