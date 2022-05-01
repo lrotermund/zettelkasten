@@ -36,6 +36,14 @@ aliases:
 	- Keep diagrams small and minimal, otherwise they fail in communicating or explaining the object model – they overwhelm the readers with detail and they lack a meaning 
 	- Diagrams can show design constrains but not specifications in every detail
 - Instead of annotating diagrams with a lot of text, you should add selective and simplified diagrams to your documents – the model is not the diagram
+- Talking is important to bind a group of people to a model and stable, shareable [[written design documents]] can help to achieve a binding
+	- A persistent document loses its connection with the flow of the project
+- [[Extreme Programming]] avoids using [[written design documents]] at all
+	- Only the running code and its tests are defining the model
+	- Documents describing the model running out of sync with the updated code, so do diagrams on a whiteboard and comments along the code
+	- But only providing the model with code overwhelms its users with detail and not only developers need to understand a model
+- Don't try to use documents as a replacement for code to document the model in detail – that's what code already does well
+	- Use documents as a bridge between your code and your conversations. They give your model meaning and insight that neither your code nor your conversations can express
 
 ***
 

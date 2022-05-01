@@ -24,8 +24,10 @@ Furthermore I use git to version my slip-box notes, to protect them online from 
 |-----------|--------|-------------------------------|
 | book      | `}b_`   | `}b_the_great_foo-JohnDoe.md`   |
 | website   | `}w_`   | `}w_cool_blog.md`              |
-| podcast   | `}p_`   | `}p_the_one_and_only_cast.md`   |
+| podcast   | `}pc_`  | `}pc_the_one_and_only_cast.md`   |
 | youtube   | `}y_`   | `}y_simple_bar_in_foo_steps.md` |
+| conference| `}c_`   | `}c_amazing_conference.md`      |
+| paper     | `}pp_`  | `}pp_informative_paper.md`      |
 | fleeting  | `~`     | `~todos-for-monday-morning.md`  |
 | person    | `@`     | `@JohnDoe.md`                 |
 
