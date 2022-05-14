@@ -59,6 +59,33 @@ Speaker: [[@Eberhard_Wolff]]
 		- The [[Bounded Context]] comes with the [[Bounded Context Canves]], a similar tool to the CRC, developed by the [[@DDD_Crew]]
 		- And the [[Bounded Context Canves]] is responsible for microservices
 		- Important: The [[Bounded Context Canves]] and the CRC are function-driven and not data-driven.
+			- You shouldn't build a system/ module based data, e.g. orders, users, etc.
+			- You should build your system/ module "function-driven", e.g. order service, registration service, etc.
+		- [[Information Hiding]] is also important for your data storage and messaging
+			- Sharing data via your database (schema) or your events is the same as exposing your private class variables
+- [[Bounded Context]]
+	- A [[Bounded Context]] bounds a model (code) to an [[ubiquitous language]]
+	- Its used to structure/ group functionality, e.g.'s
+		- invoicing process => invoicing & VAT
+		- shipping => tracking & delivery
+		- order process => shopping cart & accept orders
+	- Every [[Bounded Context]] has its own internal data models
+		- A billing address is not the same as a shipping address
+		- A change on data (e.g. the user's address) must not be shared with all modules
+		- The design decisions are hidden, e.g. data storage
+		- Important: [[Bounded Context]]'s are naturally good modules – microservices need to be good modules
+
+**microservices - productivity**
+- Expectation: microservices increase/ improve productivity
+- What does increase/ improve productivity?
+	- Frequent deployments due to small deployments with microservices
+- Do microservices matter?
+	> What is important is enabling teams to make changes to their products or services without depending on other teams or systems.
+	- Quote from [[}b_Accelerate:_The_Science_of_Lean_Software_and_DevOps:_Building_and_Scaling_High_Performing_Technology_Organizations-Gene_Kim-Jez_Humble-Nicole_Forsgren|Accelerate: The Science of Lean Software and DevOps: Building and Scaling High Performing Technology Organizations]]
+	- microservices = modules & loose coupling
+	- microservices enable independent deployments and technology decisions for modules
+		- microservices wont fix your organisation
+		- You must trust your developers to make these decisions, otherwise, you have none of the advantages of microservices, only the disadvantages, such as complexity.
 
 ## Turmbau zu Babel in nachrichtenbasierten Systemen
 Speaker: [[@Kristian_Kottke]]
