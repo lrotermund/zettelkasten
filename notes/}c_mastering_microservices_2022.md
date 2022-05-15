@@ -5,7 +5,8 @@ tags: conference/todo
 ---
 
 # Mastering Microservices 2022
-## Microservices, Monolithen - Hauptsache Module!
+## Microservices, Monoliths – It's About Modules!
+Title: Microservices, Monolithen - Hauptsache Module!
 Speaker: [[@Eberhard_Wolff]]
 
 **Today, teams are the biggest challenge for software engineering**
@@ -80,39 +81,127 @@ Speaker: [[@Eberhard_Wolff]]
 - What does increase/ improve productivity?
 	- Frequent deployments due to small deployments with microservices
 - Do microservices matter?
-	> What is important is enabling teams to make changes to their products or services without depending on other teams or systems.
-	- Quote from [[}b_Accelerate:_The_Science_of_Lean_Software_and_DevOps:_Building_and_Scaling_High_Performing_Technology_Organizations-Gene_Kim-Jez_Humble-Nicole_Forsgren|Accelerate: The Science of Lean Software and DevOps: Building and Scaling High Performing Technology Organizations]]
+	> What is important is enabling teams to make changes to their products or services without depending on other teams or systems. 
+	> - Quote from [[}b_Accelerate:_The_Science_of_Lean_Software_and_DevOps:_Building_and_Scaling_High_Performing_Technology_Organizations-Gene_Kim-Jez_Humble-Nicole_Forsgren|Accelerate: The Science of Lean Software and DevOps: Building and Scaling High Performing Technology Organizations]]
 	- microservices = modules & loose coupling
 	- microservices enable independent deployments and technology decisions for modules
 		- microservices wont fix your organisation
 		- You must trust your developers to make these decisions, otherwise, you have none of the advantages of microservices, only the disadvantages, such as complexity.
 
-## Turmbau zu Babel in nachrichtenbasierten Systemen
+## Tower of Babel in message-based systems
+Title: Turmbau zu Babel in nachrichtenbasierten Systemen
 Speaker: [[@Kristian_Kottke]]
 
+**Current project**
+- Multiple teams organised around multiple e-commerce [[domain]] services ([[Bounded Context]]'s)
+- Domain internal communication [[REST]] (backend and frontend component)
+- External communication Kafka (or other [[Message Broker]] systems like Pub/Sub or RabbitMQ) 
+	- At the start of the project, Kafka messages were submitted in JSON format
+	- Model changes, incl. breaking changes, lead to problems (e.g. string type to array)  
 
+**REST vs. Message Broker**
 
-## Micro Frontends – Entkopplung bis zur Oberfläche
+| REST | Message Broker |
+| ----- | ------------- |
+| Synchronous | Asynchronous |
+| Client-Driven (Req - Resp) | Producer-Driven (event message) |
+| Specific message version on Request | Multiple message versions (e.g. old messages in a legacy version) |
+| Backward compatibility/ breaking changes => API versioning | Multi version compatibility? |
+|  | Future consumer? |
+|  | Offset reset? (read all messages again) |
+
+- [[REST]] makes it easier to deal with changes
+	- Fixed API versioning
+	- Only backward compatibility
+	- We don't care about future changes
+- With [[Message Broker]]'s, the whole thing is a bit more complicated
+	- The producer dispatches an async message within its current version for a consumer in the future (maybe it tooks 2ms to read the message, or it tooks 2 weeks)
+	- How should new consumers deal with message formats?
+		- Should they just consider the current format (e.g. n+2) or should they also consider old formats (e.g. n & n+1)?
+- **Solution requirements**
+	- Contracts about message formats (and there syntax) incl. [[Contract Enforcement]]
+	- The support for [[Format Evolution]]
+		- Compatibility
+			- Prevent breaking changes on the format
+			- Limit the impact of format changes
+	- All this leads to
+		- Consumer safety
+		- Stability
+		- Decoupled producers and consumers – avoid implicit coupling due to the message structure (visible on the basis of simultaneous deployments)
+
+**[[Consumer-Driven Contract]] – CDC**
+
+- via [Pact](https://docs.pact.io/))
+	- The consumer defines and publishes contracts to the [[Contract Broker]]
+		- The consumer can implement and test its logic against its own contract
+	- The producer can test its logic against the consumer contracts
+	- In the case of a REST API:
+		- You can test message formats or a sequence of messages/ protocols
+	- In the case of an async communication with a [[Message Broker]]:
+		- You can use the module Message Pact to test *only* the message format
+		- Its not intuitive to use an async, producer-driven communication like a [[Message Broker]] for a consumer-driven communication
+			- Its **maybe OK** for event messages, e.g. `order submitted`
+			- Its **not OK** for command messages, e.g. `submit order`
+				- The CDC implementation via message broker feels weird here and is also a bit tricky, because the producer of a message is the consumer of a functionality
+- via [Avro](https://avro.apache.org/)
+	- Schema-based serialization system (with JSON) => contract
+	- Binary data format
+	- With a compact encoding and without field information
+	- Ships with an optional code generation based on a defined schema
+		- However, the generic message wrapper (generic record) can also be used
+	- Scheme evolution ([[Format Evolution]]) is an integral functionality
+	- Schema Registry
+		- Central schema store
+		- Enforce compatibility level
+			- `Backward`
+				- Schema n can read data n-1
+				- Changes allowed:
+					- Delete fields
+					- Add optional fields
+					- Change mandatory fields into optional fields
+			- `Forward`
+				- Schema n can read data n+1
+				- Changes allowed:
+					- 
+			- `Full`
+				- `Backward` + `Forward`
+				- Changes allowed:
+					- 
+			- `*_Transitive`
+				- All previous schema versions
+				- Changes allowed:
+					- 
+			- `None`
+				- Changes allowed:
+					- 
+	- 
+
+## Micro Frontends - Decoupling down to the User Interface
+Title: Micro Frontends – Entkopplung bis zur Oberfläche
 Speaker: [[@Michael_Geers]]
 
 
 
 ## Tackling cross-cutting concerns within your architecture
+Title: Tackling cross-cutting concerns within your architecture
 Speaker: [[@Daniel_Kocot]]
 
 
 
-## Aus der Rubrik "Spaß mit Microservices": Transaktionen
+## From the "Fun with Microservices" section: Transactions
+Title: Aus der Rubrik "Spaß mit Microservices": Transaktionen
 Speaker: [[@Lars_Röwekamp]]
 
 
 
 ## Debugging Distributed Systems
+Title: Debugging Distributed Systems
 Speaker: [[@Bert_Jan_Schrijver]]
 
 
 
-## Testing von Microservices und deren Zusammenspiel
+## Testing of microservices and their interaction
+Title: Testing von Microservices und deren Zusammenspiel
 Speaker: [[@Arne_Limburg]]
 
 
