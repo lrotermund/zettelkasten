@@ -162,25 +162,103 @@ Speaker: [[@Kristian_Kottke]]
 			- `Forward`
 				- Schema n can read data n+1
 				- Changes allowed:
-					- 
+					- Add fields
+					- Delete optional fields
+					- Convert optional field into mandatory field
 			- `Full`
 				- `Backward` + `Forward`
 				- Changes allowed:
-					- 
+					- Add optional fields
+					- Delete optional fields
+					- Convert mandatory field into optional field
+					- Convert optional field into mandatory field
 			- `*_Transitive`
-				- All previous schema versions
-				- Changes allowed:
-					- 
+				- Checks all previous schema versions against the new schema
+				- It can be attached to all the previous compatibility levels, e.g. full_transitive
 			- `None`
 				- Changes allowed:
-					- 
-	- 
+					- All changes are accepted
+	- Consumers build workflow
+		1. Generate code based on schema registry
+		2. Compile
+		3. Test
+		4. Build artifacts
+	- Workflow runtime
+		1. Producer wants to send a message
+			1. Send schema to the registry
+			2. When the schema includes compatibility level breaking updates, the schema is denied
+			3. When the schema is valid the registry returns an id + the data
+		2. Consumer wants to receive/ read a message
+			1. Checks schema id in local cache
+			2. When the id is not cached, then the consumer gets the schema by its id from the registry
+			3. Then the schema json is transformed into a generic avro record
+			4. The generic avro record can now be mapped into a generated DTO
+				- This step can fail to a compatibility mismatch to the schema
+	- Tooling
+		- Registry
+			- Confluent
+			- Karaspace
+			- Apicurio
+		- Library
+			- Confluent
+			- Apicurio
 
 ## Micro Frontends - Decoupling down to the User Interface
 Title: Micro Frontends – Entkopplung bis zur Oberfläche
 Speaker: [[@Michael_Geers]]
+	- [micro-frontends.org](micro-frontends.org)
+	- [[}b_Micro_Frontends_IN_ACTION-Michael_Geers]]
 
-
+- Frontends are usually monoliths
+- Not only backends can be modularized via microservices, the same works for frontends
+- What is it and why do you do it?
+	- Software architecture today
+		1. The monolith
+			- Includes the frontend, backend and the database
+		2. Frontend & Backend
+			- Separate frontend and backend (monolithic frontend and monolithic backend)
+		3. Microservices
+			- Monolithic frontend
+			- Aggregation Layer/ Gateway
+			- Backend Microservices
+	- Definition
+		- Websites
+			- [Thoughtworks – micro frontends](https://www.thoughtworks.com/radar/techniques/micro-frontends)
+			- [Martin Fowler – micro frontends](https://martinfowler.com/articles/micro-frontends.html)
+		- Split the browser-based code into micro frontends
+		- Each feature is owned, frontend to backend, by a different team
+		- Developed, tested and deployed independently
+	- Example e-commerce article detail page
+		- Team Checkout owns...
+			- The basket fragment
+			- And the buy button fragment
+		- Team Decide owns...
+			- The article detail page including...
+				- The product
+				- The variants
+		- Team Inspire owns...
+			- The related products fragment
+		- The teams are build around [[DDD]]s [[Bounded Context]]
+	- Independent systems
+		- Cross-functional teams
+			- UX/Design
+			- Frontend
+			- Backend
+			- Data Science
+			- Operations
+			- Product Owner
+		- End-To-End responsibility
+			- From the database to the UI
+		- Self-contained systems
+			- Separate systems that function independently of each other
+	- Why – what are the advantages?
+		- Decoupling, technical and expertise
+			- Leads to a faster development and a better time to market
+			- Three 8 person teams are more effective then one 24 person team
+			- Specialised teams (e.g. backend, frontend, product management, operations...) waist time in meetings for new features
+- How do you do it?
+- Practical examples
+- 4 tips and tricks
 
 ## Tackling cross-cutting concerns within your architecture
 Title: Tackling cross-cutting concerns within your architecture
