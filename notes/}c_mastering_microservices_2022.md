@@ -256,9 +256,92 @@ Speaker: [[@Michael_Geers]]
 			- Leads to a faster development and a better time to market
 			- Three 8 person teams are more effective then one 24 person team
 			- Specialised teams (e.g. backend, frontend, product management, operations...) waist time in meetings for new features
+	- Disadvantages
+		- Antipattern: micro frontend anarchy
+			- Agree on a shared tech stack
+			- Prepare starter kits and templates for new teams
 - How do you do it?
-- Practical examples
+	- Every page has an owner
+		- Responsibilities/ ownerships are assigned along the customer journey, e.g.:
+			- Team Inspire
+				- home
+				- list
+			- Team Decide
+				- detail
+			- Team Checkout
+				- basket
+				- payment
+				- confirm
+		- Teams provide features as pages or fragments
+		- Integration techniques/ challenges
+			- Composition
+				- techniques
+					- iframe
+					- client-side components, e.g. Web Components
+					- server-side integration, e.g. SSI, Tailor, Podium
+					- AJAX
+				- The spotify web player & desktop app were build with iframes until 2019
+				- Composition on the server with ESI or SSI
+				- Composition within the browser 
+					- ... with custom elements (web standard)
+						- Build your own html elements with a custom rendering logic
+						- Linked to a javascript implementation
+					- ... with declarative shadow DOM (browser spec)
+						- Combination between custom elements and server-side composition (hydration)
+						- Faster rendering due to included markup within the valid but unknown custom elements
+						- Not yet supported by all browsers
+			- Routing & Page Transitions
+				- techniques
+					- links
+					- client-routing, e.g. application shell
+					- server-routing, e.g. frontend-proxy, nginx
+				- Links are usually no problem
+					- Contracts between teams for a global routing table
+				- Links within a SPA
+					- Linked SPAs are no problem (hard links)
+						- easy to implement
+						- low coupling
+					- Unified SPAs
+						- Special use cases, e.g. no hard links allowed
+						- Soft links with app shell (infrastructure component)
+							- best user experience
+							- Entry point for users
+							- Can load, start and stopp SPAs
+							- Switch between SPAs
+							- Popular framework single-spa
+- Practical example
+	- Klingel Gruppe (e-commerce)
+		- happy-size.de
 - 4 tips and tricks
+	- Communication patterns
+		- URLs -> just links
+		- Attributes -> pass data from page to fragments, e.g. sku attribute on the related products fragment
+		- Events -> custom events or broadcast channel API
+	- Communication smells
+		- Communication coordinadion between more then two systems
+			- If event one is triggered within fragment A, then event two within fragment B two waits for an event three of fragment C to dispatch an event four back to fragement A via fragment B
+		- Global state management
+			- Multiple modules use the same data store
+				- Coupling!
+				- Do not share data across multiple domain modules
+					- E.g. customer address ≠ delivery address ≠ invoice address
+		- Complex payloads
+			- Leads to complexity and coupling!
+			- Modules should not share "big" objects
+			- Share IDs instead/ ping modules e.g. event "basked item added" -> custom data handling
+	- Uniform, shared design system
+		- Pattern library
+			- This is how element XYZ looks within this application
+			- This is how element XYZ reacts within this application
+			- Provide via **versioned** package
+				- Shared code & coupling! -> trade off
+				- Internal open source project
+					- No actions required from other teams -> avoids blocking
+				- E.g. via NPM
+	- Redundancy minimization
+		- Smaller tools lead to less redundancy
+			- Big tools: angular, vuejs, react
+			- Small tools: svelte, hyperapp, preact, lit-html, stencil
 
 ## Tackling cross-cutting concerns within your architecture
 Title: Tackling cross-cutting concerns within your architecture
