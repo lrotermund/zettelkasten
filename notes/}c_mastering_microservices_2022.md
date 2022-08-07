@@ -415,10 +415,116 @@ Speaker: [[@Daniel_Kocot]]
 				3. And forwards the request to one or multiple services
 				4. Where each of the services forwards the request to one or multiple pods
 					- A pod is a set of containers that must run as a unit to function
-	- [[Kubernetes]] supports and maintains multiple [[Ingress Controller]]s
+	- [[Kubernetes]] supports and maintains multiple [[Ingress Controller]]s out of the box
 		- AWS
 		- GCE
 		- nginx
+	- The [[Ingress Controller]]s are based on service proxies
+		- A [[Service Proxy]] is a network component between the client and the service, it can...
+			- add or remove HTTP headers
+			- terminate or offload SSL requests
+			- Perform URL filtering and content switching
+			- Provide content caching
+			- Support blue-green deployments and canary testing
+		- Service proxies can be
+			- Envoy
+			- OpenResty
+			- HAProxy
+	- Every [[API Gateway]] provider brings its owns [[Ingress Controller]]
+		- The setup of an [[API Gateway]] within a docker compose environment is comparable/ transferable to the providers [[Ingress Controller]] within an [[Kubernetes]] cluster
+	- Ingress / Egress
+		- Ingress gateways deal with entering traffic
+		- Egress gateways control the exiting traffic
+- Cross-cutting concerns context
+	- [[API Gateway]]s are usually extendable with plugins, policies or addons
+	- Extendable contexts
+		- Consumer
+		- Route
+		- Service
+		- Load balancing
+-  Cross-cutting concerns in detail
+	- Traffic management
+		- Access control list – handle them via [[Ingress Controller]]
+		- Rate limiting
+			- E.g. for services and consumers – consumer X is only allowed to send one request per hour to service Y
+	- Security
+		- Authorization and authentication
+			- Centralized
+			- Or additional (e.g. tenant specific)
+	- Resilience
+		- Circuit breaker (within traffic management/ on a network level)
+			- A circuit breaker protects the cluster from stacking requests to unhealthy services, resulting in cascating failures
+			- Provide a fallback mechanism when a circuit is opens due to an unhealthy service
+		- Timeouts
+			- Centralized timeout management
+- But how to govern [[Cross-cutting concerns]]?
+	- Avoid a wild west of cross-cutting concern tooling within the market place
+	- Governance is important/ required
+	- Use of OpenAPI extensions/ X-Objects to handle own or vendor needs (x-vendor-..., x-...)
+		- Supported by
+			- root level
+			- info
+			- paths
+			- operation parameters
+			- responses
+			- tags
+			- security schemas
+	- Or use OpenAPI extensions for the configuration of the [[Cross-cutting concerns]]
+		- Its a first step that is close to an API definition
+	- Establish a [[Cross-cutting concerns]] design library
+		- E.g. define, document and standartize the rate limits
+		- By using references within the OpenAPI definition
+		- Provide referenced defintions with the depoyment of the API
+		- But: not every definition should be defined globally
+		- Setup API guidelines and make the design library part of it
+- Service Mesh
+	- An [[API Gateway]]s and [[Ingress Controller]]s are responsible for incoming and outgoing traffic
+	- And a [[Service Mesh]] is responsible for the cluster internal traffic
+		- Within a cluster there are multiple services
+		- And each service consists of a container and a proxy
+		- Contrary to the [[API Gateway]], the services are not centralized
+			- But every service have a sidecar proxy
+		- To determine the differences with the [[API Gateway]], the use cases must be considered
+			- [[API Gateway]] / [[Ingress Controller]]
+				- APIs as a product (with or without monetization)
+				- Layer 7 service communication with security and monitoring across different API products
+				- Offer developers complete lifecycle management of the API
+				- Transformation of communication protocols (e.g. json -> yaml)
+			- [[Service Mesh]]
+				- Layer 4/ Layer 7 service communication with security and monitoring within the same API product
+				- Secure communication between services (we dont leave the cluster)
+- Combining [[API Gateway]]/ [[Ingress Controller]] and [[Service Mesh]]
+	1. [[API Gateway]] layer with defined API services
+	2. Composite/ integration microservices layer
+		- Grouped business logic and [[Service Mesh]] composites per microservice
+	3. Core microservices layer
+- Governing of [[Service Mesh]]
+	- Relies on the team involved
+	- Must be stated in developer guidlines
+		- Define how the [[Service Mesh]] should or will be used
+		- Write documentation and explain everything
+	- Governance within [[Service Mesh]]s is not so easy
+- [[Event Mesh]] – next big thing?
+	- Soft facts
+		- Idea of asynchronous [[Service Mesh]]
+		- Arising from slow ongoing development of existing [[Service Mesh]]s
+		- Heavily marketing driven by RedHAt, SAP and Solace
+	- Hard facts
+		- Cluster of event brokers
+		- Diverse deployment environments
+		- Protocol compatibility and translation
+			- Depends strongly on the used product
+		- Multiple client APIs
+			- Each event broker per cluster -> API for clients
+		- Classics
+			- Scalability
+			- Reliability
+			- Security
+	- But the biggest problem
+		- [[Event Mesh]]s are lacking the concept of sidecars
+		- [[Event Mesh]]s still need [[Service Mesh]]s to fulfill all needs
+		- [[Service Mesh]]s still need to support asynchronous communication
+			- E.g. by Envoy filters
 
 
 ## From the "Fun with Microservices" section: Transactions
