@@ -342,6 +342,33 @@ Speaker: [[@Michael_Geers]]
 		- Smaller tools lead to less redundancy
 			- Big tools: angular, vuejs, react
 			- Small tools: svelte, hyperapp, preact, lit-html, stencil
+		- Solution for big-tool redundancy: shared library/ CDN
+			- Non browser native solution: systemjs
+			- Works vor multiple tool versions, e.g. vuejs V2 and vuejs V3
+		- Another way is decentralised [module-federation](https://module-federation.github.io)
+			- One module loads dependencies and other modules with the same dependency just link to the already loaded dependencies
+			- Advantage: its decentralised, there is no need to simulate a CDN vor local testng, it just works local
+	- Micro frontends and native apps
+		- How to handle micro frontends?
+			- native:
+				- Just do it for the web and ignore the app
+					- Full redundancy
+					- Big tech stack across teams
+				- Download further code
+					- A lot redundancy
+					- Big, shared tech stack across teams
+			- hybride (native shell & webview)
+				- Same logic as in the web app
+					- Less redundancy
+					- Simple tech stack
+					- Small native apps -> only frames and bundling
+		- Tooling:
+			- native integrated (download further code solution)
+				- Alibaba: Atlas (Android) & BeeHive (iOS)
+				- React Native
+			- hybrid
+				- React Native
+				- ionic Portals
 
 ## Tackling cross-cutting concerns within your architecture
 Title: Tackling cross-cutting concerns within your architecture
