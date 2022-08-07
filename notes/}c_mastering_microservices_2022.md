@@ -374,6 +374,51 @@ Speaker: [[@Michael_Geers]]
 Title: Tackling cross-cutting concerns within your architecture
 Speaker: [[@Daniel_Kocot]]
 
+- Integration of requirements that are implemented for distributed/ many services across an entire system, e.g.:
+	- Logging
+	- Tracing
+	- Error handling
+- [[Cross-cutting concerns]] can be faced with
+	- [[Fascade]]s ([[Gang of Four]])
+	- An [[API Gateway]] ([[@Chris_Richardson]])
+		- Hide all invloved microservices for a call against an API
+		- It can be a proxy or its fanning out the request to multiple services
+- Infrastructure
+	- We need an orchestration for
+		- provisioning and deployment of our containers
+		- ressource management
+		- health monitoring
+		- scaling
+		- providing mappings to connect to networkings
+		- load balancing
+	- A way to handle the orchestration is [[Kubernetes]]
+	- There are a lot of alternatives to [[Kubernetes]], e.g.
+		- AWS Fargate
+		- AWS Elastic Container Service/ ECS
+		- Azure Container Instances
+		- Google Cloud Run
+		- Openshift Container Platform
+		- Rancher
+		- Docker Swarm
+		- Nomad
+		- Helios
+		- Apache Mesos
+	- The [[API Gateway]] solution is implemented as an [[Ingress Controller]] within [[Kubernetes]]
+		- How does a request looks like within
+			- An [[API Gateway]]
+				1. The client sends a request against the gateway
+				2. The gateway evaluates a set of routing rules
+				3. And forwards the request to one or multiple services
+			- An [[Ingress Controller]]
+				1. The client sends a request against the ingress within a [[Kubernetes]] cluster
+				2. The ingress evaluates a set of routing rules
+				3. And forwards the request to one or multiple services
+				4. Where each of the services forwards the request to one or multiple pods
+					- A pod is a set of containers that must run as a unit to function
+	- [[Kubernetes]] supports and maintains multiple [[Ingress Controller]]s
+		- AWS
+		- GCE
+		- nginx
 
 
 ## From the "Fun with Microservices" section: Transactions
