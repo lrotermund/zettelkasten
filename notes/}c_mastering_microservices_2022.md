@@ -531,6 +531,137 @@ Speaker: [[@Daniel_Kocot]]
 Title: Aus der Rubrik "Spaß mit Microservices": Transaktionen
 Speaker: [[@Lars_Röwekamp]]
 
+- Its easy to handle transactions that affects mutliple partial-/ sub-domains from the request to the database within a monolith
+	- A single database transaction
+- Its not trivial to handle these transactions across multiple services including there seperated databases
+	- Multiple, related database transactions
+	- Do we really need transactions or is there a domain-specific plan B?
+		- The real world is not transactional!
+- Real world example for a non transactional world
+	- **Open a shared bank account**
+		- Online
+			- Fill all input fields a realize on the last step that you dont know the birthday of your partner and you can not ask at the moment -> **failed to open the bank account**
+		- Offline
+			- Fill all the fields on a sheet but the birthday of your partner
+			- The bank consultant opens the bank account and provides a subset of functionalities but not all
+			- And you just provide the missing information later
+	- **Sending money from one bank account to another one**
+		- The transfer does not take place within a transaction, but at some point -> [[Eventual Consistency]] 
+		- Parts of the transfer must be handled transactionally per use case, e.g.
+			- The creation of transfer order
+			- The creation of the message to the other bank
+			- The reduction of the account balance
+	- There are many domain-related processes that are implemented transactional just because we have become used to it
+		- With a little effort you can often find another, more realistic way to implement these processes
+- Transaction strategies within an e-commerce application build upon microservices
+	- **The optimist**: working without transactions
+		1. The user sends a checkout command to the order service
+		2. The order service returns an order ID to the user
+		3. The order service send a decrement stock command for an article number
+	- **The fortune-teller**: it will work out somehow
+		- The order service holds a last known value of items available
+		- Not transactional but close to
+		1. The user sends a checkout command to the order service
+		2. The order service handles the order based on the last known stock value and returns an order ID to the user
+		3. The order service send a decrement stock command for an article number
+		4. The inventory service send a stock decremented event for an article number
+	- **The safeguard**: I better ask first
+		- The order service holds a last known value of items available
+		- Not transactional but close to 
+		1. The user sends a checkout command to the order service
+		2. The order service queries the inventory service for the current stock by the article number
+			- Whether this query is sent may depend on various factors or may simply be performed every time
+			- One factor may be that the last known value is so large, e.g., more than 100, that it is unlikely that anything will go wrong
+		3. The order service handles the order based on the updated last known stock value and returns an order ID to the user
+		4. The order service send a decrement stock command for an article number
+		5. The inventory service send a stock decremented event for an article number
+	- Each strategy step reduces the risk of a failing order due to an invalid stock
+		- But last but not least there is always a risk without a single database transaction
+		- The [[Eventual Consistency]] timespan is reduced
+		- The second and third strategies are the most commen
+	- Failed orders may occur, but are resolved professionally and not technically
+		- The professional, domain-related correction of failed orders is called compensation
+	- **Compansation or "the plan B"**: there is always an alternative
+		- Case: The order service received a supposedly valid order, because the last known stock for the article is 1, but the real stock is 0
+		- Is the current stock actually relevant, or is there an alternative?
+		- Perhaps more important is the question of whether I can deliver on time
+			- Are there any returns already in transit that are not included in the inventory?
+			- Are there static probabilities of returns for the article?
+			- Do I already have an open repeat order with my supplier?
+			- But: It is important to have a consistent database ([[Eventual Consistency]])
+			- Failed orders can be solved other then technically – if we look for professional, domain-related compansation strategy there is more then the commen way
+		- Another way of compensation is to apologize
+			- Be honest with yout customer, tell him that a problem occured
+			- Ask your customer if another article or var also meets their needs and offer a choice
+			- Offer a discount or a gift card for the next order
+			- Honesty in the face of mistakes will probably even make the customer a happy repeat buyer
+	- There is no "plan B", we need a transaction
+		- Scenario: Domain transaction over multiple, perfectly defined service boundries
+			- This is important because a lot of services are build upon entities instead of [[Bounded Context]]s
+			- Entity based services lead to transactional problems, as well as [[cohesion and coupling]]
+			- A use-case often happens within a single [[Bounded Context]], in a enitity based service environment multiple services are envolved in a single transaction
+		- Example from the book [[}b_Microservice_Pattern-Chris_Richardson]] (there is lots of information around this example in the internet)
+			- There is an order service with an order table and a customer service with a customer table
+			- Rule (transaction): the sum of open orders is smaller or equal to the customers credit limit
+				- How to gurantee consistant data across our service boundries?
+				- Transactions via [[SAGA Pattern]]
+					- Good paper about the "Saga" strategy [[}pp_Sagas-Hector_Garcia_Molina-Kenneth_Salem]]
+						- The paper was written in 1987 and has its focus on big, distributed databases
+						- It can be applied to distributed systems/ microservices
+					- Within a SAGA flow, multiple involved services handle cascaded, local transactions (begin, commit & rollback)
+						- After each commited transaction a message is send to the next service to trigger the next transaction
+						- A "rollback" on a failed step within the flow is called **compensation**
+							- Beacuse we can't rollback the committed transaction from the previous step
+							- And we can't rollback a send email, but we can send another email to apologize for e.g. a failed order
+							- Every step involving third parties should be checked as late as possible within the flow to do as little compensation as necessary e.g. payment service providers
+			- Happy Path
+				1. The order is created within a transaction including **the state** "pending"
+				2. The order service sends a message to the customer service to trigger the reservation
+				3. The customer service reserves a credit
+				4. The customer service sends a message to the order service to tigger **the state change**
+				5. The order service **changes the state** from "pending" to "open" ([[Eventual Consistency]])
+			- Failure while approving the order in the last step
+				1. The order is created within a transaction including **the state** "pending"
+				2. The order service sends a message to the customer service to trigger the reservation
+				3. The customer service reserves a credit
+				4. The customer service sends a message to the order service to tigger the approve of the order
+				5. The approve order command failed within the order service
+				6. The order service sends a **compensation** message to the customer service to trigger the release of the credit
+				7. The customer service releases the credit ([[Eventual Consistency]])
+				8. The customer service sends a **compensation** message to the order service to tigger the rejection of the order
+				9. The order service **changes the state** from "pending" to "rejected" ([[Eventual Consistency]])
+		- Controll SAGA's
+			- Choeography
+				- Implicit sequence control
+				- Distributed coordination through an event flow
+				- The knowledge about the steps and the communication is capsulated within the services
+				- pro
+					- loosely coupled
+						- The services doesn't know each other but they know the subscribed events and the events they have to dispatch in response
+						- Its more like pseudo loosely coupled
+					- easy implementation
+				- contra
+					- Usually cyclical dependencies
+					- Increased complexity with the [[domain model]]
+					- No centralized business code
+						- We can't change the SAGA flow in one place
+			- Ochestration
+				- Explicit sequential control
+				- Centralized SAGA coordinator within a service
+					- The triggering service is usually the SAGA orchestrator, e.g. the order service
+				- Command/ handler pattern
+				- Involved services doesn't have knowledge about the flow
+				- pro
+					- The logic is easy/ easier to understand
+					- The domain coupling is only unidirectional (from the orchestrator)
+					- No cyclical dependencies
+					- [[Separation of Concerns]] (domain logic vs transactions)
+				- contra
+					- "Smart orchestrator & dump services" Anti-Pattern
+						- There is a high risk to centralize a lot of business logic within the orchestrator
+				- You shouldn't build the orchestrator from scratch, alternatives are:
+					- Saga Framework
+					- Lightweight workflow engines
 
 
 ## Debugging Distributed Systems
